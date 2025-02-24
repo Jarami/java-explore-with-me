@@ -1,0 +1,16 @@
+services:
+  main-service:
+    image: swaggerapi/swagger-ui
+    container_name: main-service
+    environment:
+      API_URL: https://raw.githubusercontent.com/yandex-praktikum/java-explore-with-me/main/ewm-main-service-spec.json
+    ports:
+      - "9091:8080"
+
+  stat-service:
+    image: swaggerapi/swagger-ui
+    container_name: stat-service
+    environment:
+      API_URL: https://raw.githubusercontent.com/yandex-praktikum/java-explore-with-me/main/ewm-stats-service-spec.json
+    ports:
+      - "9092:8080"
