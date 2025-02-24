@@ -32,7 +32,7 @@ public class UserService {
         repo.delete(user);
     }
 
-    private User getById(long userId) {
+    public User getById(long userId) {
         return repo.findById(userId)
                 .orElseThrow(() -> new NotFoundException("пользователь с id = " + userId + " не найден"));
     }
