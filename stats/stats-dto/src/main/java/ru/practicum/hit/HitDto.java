@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class HitDto {
-    private Integer id;
+    private Long id;
 
     private String app;
 

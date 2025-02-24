@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface HitRepo extends JpaRepository<Hit, Integer> {
+public interface HitRepo extends JpaRepository<Hit, Long> {
 
     String STATS_QUERY = """
             SELECT new ru.practicum.stats.Stat(h.uri, h.app, COUNT(h.uri))
