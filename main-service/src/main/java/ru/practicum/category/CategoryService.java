@@ -1,0 +1,43 @@
+package ru.practicum.category;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import ru.practicum.category.dto.NewCategoryDto;
+import ru.practicum.category.dto.UpdatedCategoryDto;
+import ru.practicum.exception.NotFoundException;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class CategoryService {
+
+    private final CategoryRepo repo;
+    private final CategoryMapper mapper;
+
+    public Category createCategory(NewCategoryDto dto) {
+        Category category = mapper.toCategory(dto);
+        return repo.save(category);
+    }
+
+    public void deleteCategoryById(Long catId) {
+        repo.deleteById(catId);
+    }
+
+    public Category updateCategory(Long catId, UpdatedCategoryDto dto) {
+
+        Category category = getById(catId);
+        category.setName(dto.getName());
+
+        return repo.save(category);
+    }
+
+    public List<Category> getCategories(Long from, Long size) {
+        return repo.getCategories(from, size);
+    }
+
+    public Category getById(Long catId) {
+        return repo.findById(catId)
+                .orElseThrow(() -> new NotFoundException("Категория с id=" + catId + " не найдена"));
+    }
+}
