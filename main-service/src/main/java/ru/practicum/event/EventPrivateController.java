@@ -39,4 +39,12 @@ public class EventPrivateController {
         List<EventShortDto> events = service.getEventsByUser(userId, from, size);
         return new ResponseEntity<>(events, HttpStatus.OK);
     }
+
+    @GetMapping("/{eventId}")
+    public ResponseEntity<EventFullDto> getEvent(@PathVariable Long userId,
+                                                 @PathVariable Long eventId) {
+
+        EventFullDto event = service.getEvent(userId, eventId);
+        return new ResponseEntity<>(event, HttpStatus.OK);
+    }
 }

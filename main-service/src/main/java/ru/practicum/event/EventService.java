@@ -130,7 +130,18 @@ public class EventService {
 
         repo.save(event);
 
-        return repo.findFullById(event.getId());
+        return getFullById(eventId);
+    }
+
+    public EventFullDto getEvent(long userId, long eventId) {
+        User user = userService.getById(userId);
+        EventFullDto event = getFullById(eventId);
+
+        if (event.getInitiator().getId().equals(user.getId())) {
+            return event;
+        } else {
+            throw new NotFoundException("Событие с id = " + eventId + " не найдено.");
+        }
     }
 
     private List<User> getAllUsersById(List<Long> ids) {
@@ -147,6 +158,11 @@ public class EventService {
 
     private Event getById(long eventId) {
         return repo.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Событие с id = " + eventId + " не найдено."));
+    }
+
+    private EventFullDto getFullById(long eventId) {
+        return repo.findFullById(eventId)
                 .orElseThrow(() -> new NotFoundException("Событие с id = " + eventId + " не найдено."));
     }
 }

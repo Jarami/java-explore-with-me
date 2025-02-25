@@ -10,6 +10,7 @@ import ru.practicum.user.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EventRepo extends JpaRepository<Event, Long> {
@@ -92,5 +93,5 @@ public interface EventRepo extends JpaRepository<Event, Long> {
                                        long from, long size);
 
     @Query(FIND_FULL_BY_ID)
-    EventFullDto findFullById(long eventId);
+    Optional<EventFullDto> findFullById(long eventId);
 }
