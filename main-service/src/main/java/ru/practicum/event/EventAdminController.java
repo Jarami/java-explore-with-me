@@ -1,14 +1,13 @@
 package ru.practicum.event;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.event.dto.EventFullDto;
+import ru.practicum.event.dto.UpdateEventAdminRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,5 +30,12 @@ public class EventAdminController {
 
         List<EventFullDto> events = service.findEvents(users, states, categories, rangeStart, rangeEnd, from, size);
         return new ResponseEntity<>(events, HttpStatus.OK);
+    }
+
+    @PatchMapping("/{eventId}")
+    public ResponseEntity<EventFullDto> updateEvent(@PathVariable Long eventId,
+                                                    @Valid @RequestBody UpdateEventAdminRequest request) {
+
+        return new ResponseEntity<>(service.updateEvent(eventId, request), HttpStatus.OK);
     }
 }

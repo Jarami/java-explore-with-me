@@ -59,6 +59,27 @@ public interface EventRepo extends JpaRepository<Event, Long> {
             OFFSET :from
             """;
 
+    String FIND_FULL_BY_ID = """
+            SELECT new ru.practicum.event.dto.EventFullDto(e.id,
+                       e.title,
+                       e.annotation,
+                       new ru.practicum.category.dto.CategoryDto(e.category.id, e.category.name),
+                       0,
+                       e.createdOn,
+                       e.publishedOn,
+                       e.description,
+                       e.eventDate,
+                       new ru.practicum.user.dto.UserShortDto(e.initiator.id, e.initiator.name),
+                       new ru.practicum.event.dto.LocationDto(e.location.lat, e.location.lon),
+                       e.paid,
+                       e.participantLimit,
+                       e.requestModeration,
+                       e.state,
+                       0)
+            FROM Event e
+            WHERE e.id = :eventId
+            """;
+
     @Query(FIND_ALL_BY_USER_WITH_LIMIT_AND_OFFSET)
     List<EventShortDto> findAllByUserWithLimitAndOffset(User user, long from, long size);
 
@@ -69,4 +90,7 @@ public interface EventRepo extends JpaRepository<Event, Long> {
                                        boolean skipStart, LocalDateTime start,
                                        boolean skipEnd, LocalDateTime end,
                                        long from, long size);
+
+    @Query(FIND_FULL_BY_ID)
+    EventFullDto findFullById(long eventId);
 }

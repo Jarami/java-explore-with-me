@@ -2,13 +2,11 @@ package ru.practicum.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import ru.practicum.category.Category;
 import ru.practicum.category.CategoryService;
-import ru.practicum.event.dto.EventFullDto;
-import ru.practicum.event.dto.EventShortDto;
-import ru.practicum.event.dto.NewEventDto;
+import ru.practicum.event.dto.*;
+import ru.practicum.exception.NotFoundException;
 import ru.practicum.user.User;
 import ru.practicum.user.UserService;
 
@@ -78,6 +76,63 @@ public class EventService {
                 from, size);
     }
 
+    public EventFullDto updateEvent(long eventId, UpdateEventAdminRequest request) {
+        Event event = getById(eventId);
+
+        if (request.getTitle() != null) {
+            event.setTitle(request.getTitle());
+        }
+
+        if (request.getAnnotation() != null) {
+            event.setAnnotation(request.getAnnotation());
+        }
+
+        if (request.getCategory() != null) {
+            Category category = categoryService.getById(request.getCategory());
+            event.setCategory(category);
+        }
+
+        if (request.getDescription() != null) {
+            event.setDescription(request.getDescription());
+        }
+
+        if (request.getEventDate() != null) {
+            event.setEventDate(request.getEventDate());
+        }
+
+        if (request.getLocation() != null) {
+            Location location = mapper.toLocation(request.getLocation());
+            event.setLocation(location);
+        }
+
+        if (request.getPaid() != null) {
+            event.setPaid(request.getPaid());
+        }
+
+        if (request.getParticipantLimit() != null) {
+            event.setParticipantLimit(request.getParticipantLimit());
+        }
+
+        if (request.getRequestModeration() != null) {
+            event.setRequestModeration(request.getRequestModeration());
+        }
+
+        if (request.getStateAction() != null) {
+
+            EventStateAction stateAction = EventStateAction.valueOf(request.getStateAction());
+            EventState state = switch (stateAction) {
+                case EventStateAction.PUBLISH_EVENT -> EventState.PUBLISHED;
+                case EventStateAction.REJECT_EVENT -> EventState.CANCELED;
+            };
+
+            event.setState(state);
+        }
+
+        repo.save(event);
+
+        return repo.findFullById(event.getId());
+    }
+
     private List<User> getAllUsersById(List<Long> ids) {
         return ids == null ? List.of() : userService.getById(ids);
     }
@@ -88,5 +143,10 @@ public class EventService {
 
     private List<EventState> getAllEventStateById(List<String> stateNames) {
         return stateNames == null ? List.of() : EventState.getByNames(stateNames);
+    }
+
+    private Event getById(long eventId) {
+        return repo.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Событие с id = " + eventId + " не найдено."));
     }
 }
