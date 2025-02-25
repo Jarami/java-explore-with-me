@@ -29,4 +29,12 @@ public class ParticipationController {
         List<Participation> participations = service.getUserParticipations(userId);
         return new ResponseEntity<>(mapper.toDto(participations), HttpStatus.OK);
     }
+
+    @PatchMapping("/{requestId}/cancel")
+    public ResponseEntity<ParticipationRequestDto> cancelParticipation(@PathVariable Long userId,
+                                                                       @PathVariable Long requestId) {
+
+        Participation participation = service.cancelParticipation(userId, requestId);
+        return new ResponseEntity<>(mapper.toDto(participation), HttpStatus.OK);
+    }
 }

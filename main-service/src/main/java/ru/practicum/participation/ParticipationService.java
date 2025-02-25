@@ -2,6 +2,7 @@ package ru.practicum.participation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.stereotype.Service;
 import ru.practicum.event.Event;
 import ru.practicum.event.EventService;
@@ -59,6 +60,19 @@ public class ParticipationService {
     public List<Participation> getUserParticipations(long userId) {
         User user = userService.getById(userId);
         return repo.findByRequester(user);
+    }
+
+    public Participation cancelParticipation(long userId, long requestId) {
+        User user = userService.getById(userId);
+        Participation participation = getById(requestId);
+
+        if (!participation.getRequester().equals(user)) {
+            throw new NotFoundException("Заявка с id = " + requestId + " не найдена");
+        }
+
+        participation.setStatus(ParticipationStatus.CANCELED);
+
+        return repo.save(participation);
     }
 
     public Participation getById(long id) {
