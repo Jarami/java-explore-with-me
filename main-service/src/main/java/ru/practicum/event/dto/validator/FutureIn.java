@@ -1,4 +1,4 @@
-package ru.practicum.user.dto.validator;
+package ru.practicum.event.dto.validator;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -9,18 +9,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Email
 @Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = EmailPartValidator.class)
-public @interface EmailPart {
-    String message() default "Invalid email";
+@Constraint(validatedBy = FutureInValidator.class)
+public @interface FutureIn {
+    String message() default "Invalid date";
 
     Class<?>[] groups() default { };
 
     Class<? extends Payload>[] payload() default { };
 
-    int local() default 0;
-
-    int domain() default 0;
+    long seconds() default 0;
 }
