@@ -5,9 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.category.Category;
 import ru.practicum.category.CategoryService;
+import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.NewEventDto;
 import ru.practicum.user.User;
 import ru.practicum.user.UserService;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -31,5 +34,10 @@ public class EventService {
         event.setCategory(category);
 
         return repo.save(event);
+    }
+
+    public List<EventShortDto> getEventsByUser(long userId, long from, long size) {
+        User user = userService.getById(userId);
+        return repo.findAllByUserWithLimitAndOffset(user, from, size);
     }
 }
