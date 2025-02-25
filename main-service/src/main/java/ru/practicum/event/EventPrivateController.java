@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users/{userId}/events")
-public class EventController {
+public class EventPrivateController {
 
     private final EventService service;
     private final EventMapper mapper;
@@ -37,7 +37,6 @@ public class EventController {
                                                         @RequestParam(defaultValue = "10") Long size) {
 
         List<EventShortDto> events = service.getEventsByUser(userId, from, size);
-        log.info("events = {}", events);
         return new ResponseEntity<>(events, HttpStatus.OK);
     }
 }

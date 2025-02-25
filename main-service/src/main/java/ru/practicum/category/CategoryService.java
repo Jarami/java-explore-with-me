@@ -40,4 +40,8 @@ public class CategoryService {
         return repo.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Категория с id=" + catId + " не найдена"));
     }
+
+    public List<Category> getById(List<Long> ids) {
+        return repo.findAllById(ids);
+    }
 }

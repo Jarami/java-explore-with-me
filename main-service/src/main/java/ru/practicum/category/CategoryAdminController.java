@@ -12,7 +12,7 @@ import ru.practicum.category.dto.UpdatedCategoryDto;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/categories")
-public class AdminController {
+public class CategoryAdminController {
 
     private final CategoryService service;
     private final CategoryMapper mapper;

@@ -36,4 +36,8 @@ public class UserService {
         return repo.findById(userId)
                 .orElseThrow(() -> new NotFoundException("пользователь с id = " + userId + " не найден"));
     }
+
+    public List<User> getById(List<Long> ids) {
+        return repo.findAllById(ids);
+    }
 }
