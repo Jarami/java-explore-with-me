@@ -1,10 +1,7 @@
 package ru.practicum.event;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.data.annotation.CreatedDate;
@@ -19,6 +16,7 @@ import static ru.practicum.event.EventState.*;
 @Getter
 @Setter
 @Entity
+@ToString
 @Table(name = "events")
 @NoArgsConstructor
 @AllArgsConstructor

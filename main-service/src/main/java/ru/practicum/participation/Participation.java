@@ -1,10 +1,7 @@
 package ru.practicum.participation;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import ru.practicum.event.Event;
@@ -18,6 +15,8 @@ import static ru.practicum.participation.ParticipationStatus.PENDING;
 @Setter
 @Entity
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "participations")
 @EqualsAndHashCode(of = {"id"})
 @EntityListeners(AuditingEntityListener.class)

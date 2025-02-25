@@ -11,6 +11,8 @@ import ru.practicum.exception.NotFoundException;
 import ru.practicum.user.User;
 import ru.practicum.user.UserService;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -52,6 +54,11 @@ public class ParticipationService {
                 .build();
 
         return repo.save(participation);
+    }
+
+    public List<Participation> getUserParticipations(long userId) {
+        User user = userService.getById(userId);
+        return repo.findByRequester(user);
     }
 
     public Participation getById(long id) {
