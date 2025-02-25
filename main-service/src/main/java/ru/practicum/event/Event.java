@@ -1,7 +1,9 @@
 package ru.practicum.event;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
@@ -18,6 +20,8 @@ import static ru.practicum.event.EventState.*;
 @Setter
 @Entity
 @Table(name = "events")
+@NoArgsConstructor
+@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class Event {
     @Id
@@ -73,6 +77,31 @@ public class Event {
     private LocalDateTime createdOn;
 
     private LocalDateTime publishedOn;
+
+    @Transient
+    private long confirmedRequests;
+
+    @Transient
+    private long views;
+
+    public Event(Event e, long confirmedRequests, long views) {
+        this.id = e.id;
+        this.title = e.title;
+        this.annotation = e.annotation;
+        this.category = e.category;
+        this.initiator = e.initiator;
+        this.description = e.description;
+        this.eventDate = e.eventDate;
+        this.location = e.location;
+        this.paid = e.paid;
+        this.participantLimit = e.participantLimit;
+        this.requestModeration = e.requestModeration;
+        this.state = e.state;
+        this.createdOn = e.createdOn;
+        this.publishedOn = e.publishedOn;
+        this.confirmedRequests = confirmedRequests;
+        this.views = views;
+    }
 
     public void setState(EventState newState) {
         if (newState == PUBLISHED && state != PENDING) {

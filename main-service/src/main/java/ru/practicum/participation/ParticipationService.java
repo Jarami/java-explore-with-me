@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.practicum.event.Event;
 import ru.practicum.event.EventService;
 import ru.practicum.event.EventState;
-import ru.practicum.event.dto.EventFullDto;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.user.User;
@@ -25,11 +24,11 @@ public class ParticipationService {
     public Participation createParticipation(long userId, long eventId) {
 
         User user = userService.getById(userId);
-        EventFullDto event = eventService.getFullById(eventId);
+        Event event = eventService.getFullById(eventId);
 
         log.info("event = {}", event);
 
-        if (event.getInitiator().getId().equals(user.getId())) {
+        if (event.getInitiator().equals(user)) {
             throw new ConflictException("Нельзя отправлять заявку на участие в собственном событии");
         }
 
@@ -47,7 +46,7 @@ public class ParticipationService {
         }
 
         Participation participation = Participation.builder()
-                .event(eventService.getById(eventId))
+                .event(event)
                 .requester(user)
                 .status(status)
                 .build();

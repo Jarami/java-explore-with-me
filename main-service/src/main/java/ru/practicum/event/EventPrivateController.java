@@ -37,16 +37,16 @@ public class EventPrivateController {
                                                         @RequestParam(defaultValue = "0") Long from,
                                                         @RequestParam(defaultValue = "10") Long size) {
 
-        List<EventShortDto> events = service.getEventsByUser(userId, from, size);
-        return new ResponseEntity<>(events, HttpStatus.OK);
+        List<Event> events = service.getEventsByUser(userId, from, size);
+        return new ResponseEntity<>(mapper.toShortDto(events), HttpStatus.OK);
     }
 
     @GetMapping("/{eventId}")
     public ResponseEntity<EventFullDto> getEvent(@PathVariable Long userId,
                                                  @PathVariable Long eventId) {
 
-        EventFullDto event = service.getEvent(userId, eventId);
-        return new ResponseEntity<>(event, HttpStatus.OK);
+        Event event = service.getEvent(userId, eventId);
+        return new ResponseEntity<>(mapper.toFullDto(event), HttpStatus.OK);
     }
 
     @PatchMapping("/{eventId}")
@@ -54,7 +54,7 @@ public class EventPrivateController {
                                                     @PathVariable Long eventId,
                                                     @Valid @RequestBody UpdateEventUserRequest request) {
 
-        EventFullDto event = service.updateEventByUser(userId, eventId, request);
-        return new ResponseEntity<>(event, HttpStatus.OK);
+        Event event = service.updateEventByUser(userId, eventId, request);
+        return new ResponseEntity<>(mapper.toFullDto(event), HttpStatus.OK);
     }
 }

@@ -28,14 +28,15 @@ public class EventAdminController {
                                                          @RequestParam(defaultValue = "0") Long from,
                                                          @RequestParam(defaultValue = "10") Long size) {
 
-        List<EventFullDto> events = service.findEvents(users, states, categories, rangeStart, rangeEnd, from, size);
-        return new ResponseEntity<>(events, HttpStatus.OK);
+        List<Event> events = service.findEvents(users, states, categories, rangeStart, rangeEnd, from, size);
+        return new ResponseEntity<>(mapper.toFullDto(events), HttpStatus.OK);
     }
 
     @PatchMapping("/{eventId}")
     public ResponseEntity<EventFullDto> updateEvent(@PathVariable Long eventId,
                                                     @Valid @RequestBody UpdateEventAdminRequest request) {
 
-        return new ResponseEntity<>(service.updateEventByAdmin(eventId, request), HttpStatus.OK);
+        Event event = service.updateEventByAdmin(eventId, request);
+        return new ResponseEntity<>(mapper.toFullDto(event), HttpStatus.OK);
     }
 }

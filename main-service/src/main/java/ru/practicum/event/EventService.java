@@ -38,12 +38,12 @@ public class EventService {
         return repo.save(event);
     }
 
-    public List<EventShortDto> getEventsByUser(long userId, long from, long size) {
+    public List<Event> getEventsByUser(long userId, long from, long size) {
         User user = userService.getById(userId);
         return repo.findAllByUserWithLimitAndOffset(user, from, size);
     }
 
-    public List<EventFullDto> findEvents(List<Long> userIds, List<String> stateNames, List<Long> categoryIds,
+    public List<Event> findEvents(List<Long> userIds, List<String> stateNames, List<Long> categoryIds,
                                          LocalDateTime rangeStart, LocalDateTime rangeEnd, Long from, Long size) {
 
         log.info("find events for userIds = {}, stateNames = {}, categoryIds = {}, rangeStart = {}, rangeEnd = {}, from = {}, size = {}",
@@ -77,8 +77,8 @@ public class EventService {
                 from, size);
     }
 
-    public EventFullDto updateEventByAdmin(long eventId, UpdateEventRequest request) {
-        Event event = getById(eventId);
+    public Event updateEventByAdmin(long eventId, UpdateEventRequest request) {
+        Event event = getFullById(eventId);
 
         if (request.getStateAction() != null) {
 
@@ -95,10 +95,10 @@ public class EventService {
         return updateEvent(event, request);
     }
 
-    public EventFullDto updateEventByUser(long userId, long eventId, UpdateEventRequest request) {
+    public Event updateEventByUser(long userId, long eventId, UpdateEventRequest request) {
 
         User user = userService.getById(userId);
-        Event event = getById(eventId);
+        Event event = getFullById(eventId);
 
         if (!event.getInitiator().equals(user)) {
             throw new NotFoundException("Событие с id = " + eventId + " не найдено.");
@@ -119,7 +119,7 @@ public class EventService {
         return updateEvent(event, request);
     }
 
-    private EventFullDto updateEvent(Event event, UpdateEventRequest request) {
+    private Event updateEvent(Event event, UpdateEventRequest request) {
         if (request.getTitle() != null) {
             event.setTitle(request.getTitle());
         }
@@ -158,16 +158,14 @@ public class EventService {
             event.setRequestModeration(request.getRequestModeration());
         }
 
-        repo.save(event);
-
-        return getFullById(event.getId());
+        return repo.save(event);
     }
 
-    public EventFullDto getEvent(long userId, long eventId) {
+    public Event getEvent(long userId, long eventId) {
         User user = userService.getById(userId);
-        EventFullDto event = getFullById(eventId);
+        Event event = getFullById(eventId);
 
-        if (event.getInitiator().getId().equals(user.getId())) {
+        if (event.getInitiator().equals(user)) {
             return event;
         } else {
             throw new NotFoundException("Событие с id = " + eventId + " не найдено.");
@@ -191,7 +189,7 @@ public class EventService {
                 .orElseThrow(() -> new NotFoundException("Событие с id = " + eventId + " не найдено."));
     }
 
-    public EventFullDto getFullById(long eventId) {
+    public Event getFullById(long eventId) {
         return repo.findFullById(eventId)
                 .orElseThrow(() -> new NotFoundException("Событие с id = " + eventId + " не найдено."));
     }
