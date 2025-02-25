@@ -2,11 +2,11 @@ package ru.practicum.participation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.ast.Not;
 import org.springframework.stereotype.Service;
 import ru.practicum.event.Event;
 import ru.practicum.event.EventService;
 import ru.practicum.event.EventState;
+import ru.practicum.exception.BadRequestException;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.user.User;
@@ -73,6 +73,17 @@ public class ParticipationService {
         participation.setStatus(ParticipationStatus.CANCELED);
 
         return repo.save(participation);
+    }
+
+    public List<Participation> getParticipationsOfEvent(long userId, long eventId) {
+        User user = userService.getById(userId);
+        Event event = eventService.getById(eventId);
+
+        if (!event.getInitiator().equals(user)) {
+            throw new NotFoundException("Событие с id = " + eventId + " не найдено.");
+        }
+
+        return repo.findByEvent(event);
     }
 
     public Participation getById(long id) {

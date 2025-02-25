@@ -11,6 +11,10 @@ import ru.practicum.event.dto.EventFullDto;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.NewEventDto;
 import ru.practicum.event.dto.UpdateEventUserRequest;
+import ru.practicum.participation.Participation;
+import ru.practicum.participation.ParticipationMapper;
+import ru.practicum.participation.ParticipationService;
+import ru.practicum.participation.dto.ParticipationRequestDto;
 
 import java.util.List;
 
@@ -23,6 +27,8 @@ public class EventPrivateController {
 
     private final EventService service;
     private final EventMapper mapper;
+    private final ParticipationService participationService;
+    private final ParticipationMapper participationMapper;
 
     @PostMapping
     public ResponseEntity<EventFullDto> createEvent(@Valid @RequestBody NewEventDto dto,
@@ -56,5 +62,14 @@ public class EventPrivateController {
 
         Event event = service.updateEventByUser(userId, eventId, request);
         return new ResponseEntity<>(mapper.toFullDto(event), HttpStatus.OK);
+    }
+
+    @GetMapping("/{eventId}/requests")
+    public ResponseEntity<List<ParticipationRequestDto>> getParticipationsOfEvent(@PathVariable Long userId,
+                                                                                  @PathVariable Long eventId) {
+
+        List<Participation> participations = participationService.getParticipationsOfEvent(userId, eventId);
+        return new ResponseEntity<>(participationMapper.toDto(participations), HttpStatus.OK);
+
     }
 }
