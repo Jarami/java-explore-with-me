@@ -1,7 +1,8 @@
 DROP TABLE IF EXISTS categories CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS events CASCADE;
-DROP TYPE IF EXISTS EVENT_STATE CASCADE;
+DROP TABLE IF EXISTS participations CASCADE;
+
 
 CREATE TABLE categories (
     id BIGSERIAL PRIMARY KEY,
@@ -88,3 +89,32 @@ COMMENT ON COLUMN events.participant_limit IS 'Ограничение на ко�
 COMMENT ON COLUMN events.request_moderation IS 'Нужна ли пре-модерация заявок на участие. Если true, то все заявки будут ожидать подтверждения инициатором события. Если false - то будут подтверждаться автоматически.';
 COMMENT ON COLUMN events.created_on IS 'Дата-время создания события';
 COMMENT ON COLUMN events.published_on IS 'Дата-время публикации события';
+
+CREATE TABLE participations (
+    id BIGSERIAL PRIMARY KEY,
+    event_id BIGINT NOT NULL,
+    requester_id BIGINT NOT NULL,
+    status VARCHAR NOT NULL,
+    created_on TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+
+    CONSTRAINT participations_requester_fk
+        FOREIGN KEY(requester_id)
+            REFERENCES users(id)
+                ON DELETE CASCADE,
+
+    CONSTRAINT participations_event_fk
+        FOREIGN KEY(event_id)
+            REFERENCES events(id)
+                ON DELETE CASCADE,
+
+    CONSTRAINT participations_status_values
+        CHECK (status IN ('PENDING', 'CONFIRMED', 'CANCELED')),
+
+    CONSTRAINT participations_unique UNIQUE (event_id, requester_id)
+);
+COMMENT ON TABLE participations IS 'Таблица заявок на участие в событиях';
+COMMENT ON COLUMN participations.id IS 'Идентификатор заявки';
+COMMENT ON COLUMN participations.event_id IS 'Идентификатор события';
+COMMENT ON COLUMN participations.requester_id IS 'Идентификатор пользователя, отправившего заявку';
+COMMENT ON COLUMN participations.status IS 'Статус заявки';
+COMMENT ON COLUMN participations.created_on IS 'Дата-время создания заявки';

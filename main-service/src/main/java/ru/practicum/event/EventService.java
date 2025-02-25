@@ -186,12 +186,12 @@ public class EventService {
         return stateNames == null ? List.of() : EventState.getByNames(stateNames);
     }
 
-    private Event getById(long eventId) {
+    public Event getById(long eventId) {
         return repo.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Событие с id = " + eventId + " не найдено."));
     }
 
-    private EventFullDto getFullById(long eventId) {
+    public EventFullDto getFullById(long eventId) {
         return repo.findFullById(eventId)
                 .orElseThrow(() -> new NotFoundException("Событие с id = " + eventId + " не найдено."));
     }

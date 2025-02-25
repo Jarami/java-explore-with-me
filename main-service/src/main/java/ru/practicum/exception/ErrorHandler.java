@@ -45,6 +45,19 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleConflict(ConflictException e) {
+
+        ErrorResponse response = ErrorResponse.builder()
+                .status("CONFLICT")
+                .reason("Integrity constraint has been violated.")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleConstrainViolation(ConstraintViolationException e) {
 
         Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
