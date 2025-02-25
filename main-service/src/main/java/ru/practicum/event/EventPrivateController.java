@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.event.dto.EventFullDto;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.NewEventDto;
+import ru.practicum.event.dto.UpdateEventUserRequest;
 
 import java.util.List;
 
@@ -45,6 +46,15 @@ public class EventPrivateController {
                                                  @PathVariable Long eventId) {
 
         EventFullDto event = service.getEvent(userId, eventId);
+        return new ResponseEntity<>(event, HttpStatus.OK);
+    }
+
+    @PatchMapping("/{eventId}")
+    public ResponseEntity<EventFullDto> updateEvent(@PathVariable Long userId,
+                                                    @PathVariable Long eventId,
+                                                    @Valid @RequestBody UpdateEventUserRequest request) {
+
+        EventFullDto event = service.updateEventByUser(userId, eventId, request);
         return new ResponseEntity<>(event, HttpStatus.OK);
     }
 }

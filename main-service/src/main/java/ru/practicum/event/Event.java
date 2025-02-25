@@ -78,8 +78,11 @@ public class Event {
         if (newState == PUBLISHED && state != PENDING) {
             throw new ConflictException("Опубликовать можно только ожидающие события!");
         }
-        if (newState == CANCELED && state == PUBLISHED){
+        if (newState == CANCELED && state == PUBLISHED) {
             throw new ConflictException("Отклонить можно только неопубликованное событие!");
+        }
+        if (newState == PENDING && state == PUBLISHED) {
+            throw new ConflictException("Изменить можно только неопубликованное событие!");
         }
         state = newState;
     }

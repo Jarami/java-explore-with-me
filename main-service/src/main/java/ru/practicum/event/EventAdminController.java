@@ -36,6 +36,6 @@ public class EventAdminController {
     public ResponseEntity<EventFullDto> updateEvent(@PathVariable Long eventId,
                                                     @Valid @RequestBody UpdateEventAdminRequest request) {
 
-        return new ResponseEntity<>(service.updateEvent(eventId, request), HttpStatus.OK);
+        return new ResponseEntity<>(service.updateEventByAdmin(eventId, request), HttpStatus.OK);
     }
 }

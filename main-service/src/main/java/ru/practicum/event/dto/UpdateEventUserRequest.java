@@ -9,7 +9,7 @@ import ru.practicum.event.dto.validator.FutureIn;
 import java.time.LocalDateTime;
 
 @Data
-public class UpdateEventAdminRequest implements UpdateEventRequest {
+public class UpdateEventUserRequest implements UpdateEventRequest {
     @Size(min = 3, max = 120, message = "Заголовок события должен содержать от 20-ти до 2000 символов")
     private String title;
 
@@ -21,7 +21,7 @@ public class UpdateEventAdminRequest implements UpdateEventRequest {
     @Size(min = 20, max = 7000, message = "Описание события должно содержать от 20-ти до 7000 символов")
     private String description;
 
-    @FutureIn(seconds = 60*60)
+    @FutureIn(seconds = 2*60*60)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 

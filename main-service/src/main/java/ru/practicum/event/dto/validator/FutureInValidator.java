@@ -16,7 +16,7 @@ public class FutureInValidator implements ConstraintValidator<FutureIn, LocalDat
     @Override
     public boolean isValid(LocalDateTime value, ConstraintValidatorContext context) {
         if (value == null) {
-            return false;
+            return true;
         }
 
         LocalDateTime futureTime = LocalDateTime.now().plusSeconds(seconds);

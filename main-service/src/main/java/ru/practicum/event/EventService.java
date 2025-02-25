@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.category.Category;
 import ru.practicum.category.CategoryService;
 import ru.practicum.event.dto.*;
+import ru.practicum.exception.BadRequestException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.user.User;
 import ru.practicum.user.UserService;
@@ -76,9 +77,49 @@ public class EventService {
                 from, size);
     }
 
-    public EventFullDto updateEvent(long eventId, UpdateEventAdminRequest request) {
+    public EventFullDto updateEventByAdmin(long eventId, UpdateEventRequest request) {
         Event event = getById(eventId);
 
+        if (request.getStateAction() != null) {
+
+            EventStateAction stateAction = EventStateAction.valueOf(request.getStateAction());
+            EventState state = switch (stateAction) {
+                case EventStateAction.PUBLISH_EVENT -> EventState.PUBLISHED;
+                case EventStateAction.REJECT_EVENT -> EventState.CANCELED;
+                default -> throw new BadRequestException("Запрещенный stateAction " + stateAction);
+            };
+
+            event.setState(state);
+        }
+
+        return updateEvent(event, request);
+    }
+
+    public EventFullDto updateEventByUser(long userId, long eventId, UpdateEventRequest request) {
+
+        User user = userService.getById(userId);
+        Event event = getById(eventId);
+
+        if (!event.getInitiator().equals(user)) {
+            throw new NotFoundException("Событие с id = " + eventId + " не найдено.");
+        }
+
+        if (request.getStateAction() != null) {
+
+            EventStateAction stateAction = EventStateAction.valueOf(request.getStateAction());
+            EventState state = switch (stateAction) {
+                case EventStateAction.SEND_TO_REVIEW -> EventState.PENDING;
+                case EventStateAction.CANCEL_REVIEW -> EventState.CANCELED;
+                default -> throw new BadRequestException("Запрещенный stateAction " + stateAction);
+            };
+
+            event.setState(state);
+        }
+
+        return updateEvent(event, request);
+    }
+
+    private EventFullDto updateEvent(Event event, UpdateEventRequest request) {
         if (request.getTitle() != null) {
             event.setTitle(request.getTitle());
         }
@@ -117,20 +158,9 @@ public class EventService {
             event.setRequestModeration(request.getRequestModeration());
         }
 
-        if (request.getStateAction() != null) {
-
-            EventStateAction stateAction = EventStateAction.valueOf(request.getStateAction());
-            EventState state = switch (stateAction) {
-                case EventStateAction.PUBLISH_EVENT -> EventState.PUBLISHED;
-                case EventStateAction.REJECT_EVENT -> EventState.CANCELED;
-            };
-
-            event.setState(state);
-        }
-
         repo.save(event);
 
-        return getFullById(eventId);
+        return getFullById(event.getId());
     }
 
     public EventFullDto getEvent(long userId, long eventId) {
