@@ -8,9 +8,11 @@ import org.hibernate.validator.constraints.Range;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import ru.practicum.category.Category;
+import ru.practicum.exception.ConflictException;
 import ru.practicum.user.User;
 
 import java.time.LocalDateTime;
+import static ru.practicum.event.EventState.*;
 
 @Getter
 @Setter
@@ -64,11 +66,21 @@ public class Event {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private EventState state = EventState.PENDING;
+    private EventState state = PENDING;
 
     @CreatedDate
     @Column(nullable = false)
     private LocalDateTime createdOn;
 
     private LocalDateTime publishedOn;
+
+    public void setState(EventState newState) {
+        if (newState == PUBLISHED && state != PENDING) {
+            throw new ConflictException("Опубликовать можно только ожидающие события!");
+        }
+        if (newState == CANCELED && state == PUBLISHED){
+            throw new ConflictException("Отклонить можно только неопубликованное событие!");
+        }
+        state = newState;
+    }
 }
