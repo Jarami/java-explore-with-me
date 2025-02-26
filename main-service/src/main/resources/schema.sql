@@ -2,7 +2,8 @@ DROP TABLE IF EXISTS categories CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS events CASCADE;
 DROP TABLE IF EXISTS participations CASCADE;
-
+DROP TABLE IF EXISTS compilations CASCADE;
+DROP TABLE IF EXISTS compilations_events CASCADE;
 
 CREATE TABLE categories (
     id BIGSERIAL PRIMARY KEY,
@@ -118,3 +119,30 @@ COMMENT ON COLUMN participations.event_id IS 'Идентификатор соб�
 COMMENT ON COLUMN participations.requester_id IS 'Идентификатор пользователя, отправившего заявку';
 COMMENT ON COLUMN participations.status IS 'Статус заявки';
 COMMENT ON COLUMN participations.created_on IS 'Дата-время создания заявки';
+
+CREATE TABLE compilations (
+    id BIGSERIAL PRIMARY KEY,
+    title VARCHAR(50) NOT NULL,
+    pinned BOOLEAN NOT NULL DEFAULT false,
+    CONSTRAINT compilations_title_unq UNIQUE (title)
+);
+COMMENT ON TABLE compilations IS 'Таблица подборок событий';
+COMMENT ON COLUMN compilations.id IS 'Идентификатор подборки';
+COMMENT ON COLUMN compilations.title IS 'Название подборки';
+COMMENT ON COLUMN compilations.pinned IS 'Закреплена ли подборка на главной странице сайта';
+
+CREATE TABLE compilations_events (
+    compilation_id BIGINT,
+    events_id BIGINT,
+
+    CONSTRAINT compilations_events_compilation_fk
+        FOREIGN KEY(compilation_id)
+            REFERENCES compilations(id)
+                ON DELETE CASCADE,
+
+    CONSTRAINT compilations_events_event_fk
+        FOREIGN KEY(events_id)
+            REFERENCES events(id)
+                ON DELETE CASCADE
+);
+COMMENT ON TABLE compilations_events IS 'Ассоциативная таблица событий и подборок событий';

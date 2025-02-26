@@ -276,7 +276,13 @@ public class EventService {
     }
 
     public Event getFullById(long eventId) {
+        // TODO: добавить views
         return repo.findFullById(eventId)
                 .orElseThrow(() -> new NotFoundException("Событие с id = " + eventId + " не найдено."));
+    }
+
+    public List<Event> getAllFullById(List<Long> eventIds) {
+        // TODO: добавить views
+        return repo.findAllFullById(eventIds);
     }
 }

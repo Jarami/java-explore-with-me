@@ -47,65 +47,13 @@ public interface EventRepo extends JpaRepository<Event, Long> {
             GROUP BY e
             """;
 
-//    String SEARCH_ALL_BY_PARAMS = """
-//            SELECT new Event(t.id,
-//                             t.title,
-//                             t.annotation,
-//                             t.category,
-//                             t.initiator,
-//                             t.description,
-//                             t.eventDate,
-//                             t.location,
-//                             t.paid,
-//                             t.participantLimit,
-//                             t.requestModeration,
-//                             t.state,
-//                             t.createdOn,
-//                             t.publishedOn,
-//                             t.confirmedRequests,
-//                             0)
-//            FROM (
-//                SELECT e.id,
-//                       e.title,
-//                       e.annotation,
-//                       e.category,
-//                       e.initiator,
-//                       e.description,
-//                       e.eventDate,
-//                       e.location,
-//                       e.paid,
-//                       e.participantLimit,
-//                       e.requestModeration,
-//                       e.state,
-//                       e.createdOn,
-//                       e.publishedOn,
-//                       count(p.id) as confirmedRequests
-//                FROM Event e
-//                LEFT JOIN Participation p ON p.event = e AND p.status = 'CONFIRMED'
-//                WHERE ( :skipText = true OR LOWER(e.annotation) LIKE %:text% OR LOWER(e.description) LIKE %:text% )
-//                AND ( :skipCategories = true OR e.category IN (:categories) )
-//                AND ( :skipPaid = true OR e.paid = :paid )
-//                AND ( :skipStart = true OR e.eventDate >= :start )
-//                AND ( :skipEnd = true OR e.eventDate <= :end )
-//                AND e.state = 'PUBLISHED'
-//                GROUP BY e.id,
-//                         e.title,
-//                         e.annotation,
-//                         e.category,
-//                         e.initiator,
-//                         e.description,
-//                         e.eventDate,
-//                         e.location,
-//                         e.paid,
-//                         e.participantLimit,
-//                         e.requestModeration,
-//                         e.state,
-//                         e.createdOn,
-//                         e.publishedOn
-//                ORDER BY e.eventDate DESC
-//            ) AS t
-//            WHERE ( :onlyAvailable = false OR t.participantLimit < t.confirmedRequests )
-//            """;
+    String FIND_FULL_BY_IDS = """
+            SELECT new Event(e, count(p.id), 0)
+            FROM Event e
+            LEFT JOIN Participation p ON p.event = e AND p.status = 'CONFIRMED'
+            WHERE e.id IN (:eventIds)
+            GROUP BY e
+            """;
 
     String SEARCH_ALL_BY_PARAMS = """
             SELECT new Event(e, count(p.id), 0)
@@ -134,6 +82,9 @@ public interface EventRepo extends JpaRepository<Event, Long> {
 
     @Query(FIND_FULL_BY_ID)
     Optional<Event> findFullById(long eventId);
+
+    @Query(FIND_FULL_BY_IDS)
+    List<Event> findAllFullById(List<Long> eventIds);
 
     @Query(SEARCH_ALL_BY_PARAMS)
     List<Event> searchAllByParams(boolean skipText, String text,
