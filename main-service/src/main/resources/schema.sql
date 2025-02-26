@@ -109,7 +109,7 @@ CREATE TABLE participations (
                 ON DELETE CASCADE,
 
     CONSTRAINT participations_status_values
-        CHECK (status IN ('PENDING', 'CONFIRMED', 'CANCELED')),
+        CHECK (status IN ('PENDING', 'CONFIRMED', 'REJECTED', 'CANCELED')),
 
     CONSTRAINT participations_unique UNIQUE (event_id, requester_id)
 );

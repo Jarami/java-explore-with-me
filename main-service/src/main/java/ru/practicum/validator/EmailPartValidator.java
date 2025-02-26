@@ -29,6 +29,14 @@ public class EmailPartValidator implements ConstraintValidator<EmailPart, String
             return false;
         }
 
-        return chunks[0].length() <= local && chunks[1].length() <= domain;
+        String localPart = chunks[0];
+        String domainPart = chunks[1];
+
+        int lastPointIndex = domainPart.lastIndexOf(".");
+        if (lastPointIndex != -1) {
+            domainPart = domainPart.substring(lastPointIndex);
+        }
+
+        return localPart.length() <= local && domainPart.length() <= domain;
     }
 }

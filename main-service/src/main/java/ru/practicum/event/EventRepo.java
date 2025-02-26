@@ -25,9 +25,9 @@ public interface EventRepo extends JpaRepository<Event, Long> {
             """;
 
     String FIND_ALL_BY_PARAMS = """
-            SELECT new Event(e, count(p.id), 0)
+            SELECT new Event(e, count(p), 0)
             FROM Event e
-            LEFT JOIN Participation p ON p.event = e AND p.status = 'CONFIRMED'
+            LEFT JOIN FETCH Participation p ON p.event = e AND p.status = 'CONFIRMED'
             WHERE ( :skipUsers = true OR e.initiator IN (:users) )
             AND ( :skipCategories = true OR e.category IN (:categories) )
             AND ( :skipStates = true OR e.state IN (:states) )

@@ -2,18 +2,21 @@ package ru.practicum.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.user.dto.NewUserRequest;
 
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepo repo;
     private final UserMapper mapper;
 
+    @Transactional
     public User createUser(NewUserRequest request) {
         User user = mapper.toUser(request);
         return repo.save(user);
@@ -27,6 +30,7 @@ public class UserService {
         return repo.findUsersByIdsWithLimitAndOffset(ids, from, size);
     }
 
+    @Transactional
     public void deleteUserById(long userId) {
         User user = getById(userId);
         repo.delete(user);

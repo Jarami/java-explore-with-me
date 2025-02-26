@@ -3,5 +3,6 @@ package ru.practicum.participation;
 public enum ParticipationStatus {
     PENDING,
     CONFIRMED,
-    REJECTED
+    REJECTED,
+    CANCELED
 }

@@ -3,6 +3,7 @@ package ru.practicum.event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.category.Category;
 import ru.practicum.category.CategoryService;
 import ru.practicum.event.dto.*;
@@ -21,6 +22,7 @@ import static ru.practicum.event.EventState.*;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class EventService {
 
@@ -29,6 +31,7 @@ public class EventService {
     private final EventRepo repo;
     private final EventMapper mapper;
 
+    @Transactional
     public Event createEvent(NewEventDto dto, long userId) {
 
         log.info("creating event from {} by user {}", dto, userId);
@@ -78,14 +81,19 @@ public class EventService {
         List<Category> categories = getAllCategoriesById(categoryIds);
         List<EventState> states = getAllEventStateById(stateNames);
 
-        return repo.findAllByParams(userIds == null, users,
+        List<Event> events = repo.findAllByParams(userIds == null, users,
                 categoryIds == null, categories,
                 stateNames == null, states,
                 rangeStart == null, rangeStart,
                 rangeEnd == null, rangeEnd,
                 from, size);
+
+        log.info("found events {}", events);
+
+        return events;
     }
 
+    @Transactional
     public Event updateEventByAdmin(long eventId, UpdateEventRequest request) {
         Event event = getFullById(eventId);
 
@@ -104,6 +112,7 @@ public class EventService {
         return updateEvent(event, request);
     }
 
+    @Transactional
     public Event updateEventByUser(long userId, long eventId, UpdateEventRequest request) {
 
         User user = userService.getById(userId);
@@ -134,6 +143,7 @@ public class EventService {
         return updateEvent(event, request);
     }
 
+    @Transactional
     private Event updateEvent(Event event, UpdateEventRequest request) {
         if (request.getTitle() != null) {
             event.setTitle(request.getTitle());

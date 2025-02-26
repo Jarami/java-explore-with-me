@@ -3,6 +3,7 @@ package ru.practicum.compilation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.compilation.dto.NewCompilationDto;
 import ru.practicum.compilation.dto.UpdateCompilationRequest;
 import ru.practicum.event.Event;
@@ -14,12 +15,14 @@ import java.util.List;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CompilationService {
 
     private final EventService eventService;
     private final CompilationRepo repo;
 
+    @Transactional(readOnly = true)
     public List<Compilation> getCompilations(boolean pinned, long from, long size) {
 
         log.info("get compilations for pinned {}, from {}, size {}", pinned, from, size);
@@ -91,6 +94,7 @@ public class CompilationService {
         }
     }
 
+    @Transactional(readOnly = true)
     public Compilation getById(Long id) {
         return repo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Подборка с id = " + id + " не найдена"));

@@ -3,6 +3,7 @@ package ru.practicum.participation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.event.Event;
 import ru.practicum.event.EventService;
 import ru.practicum.event.EventState;
@@ -19,6 +20,7 @@ import static ru.practicum.participation.ParticipationStatus.*;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ParticipationService {
 
@@ -29,10 +31,10 @@ public class ParticipationService {
 
     public Participation createParticipation(long userId, long eventId) {
 
+        log.info("create participation for event {} by user {}", eventId, userId);
+
         User user = userService.getById(userId);
         Event event = eventService.getFullById(eventId);
-
-        log.info("event = {}", event);
 
         if (event.getInitiator().equals(user)) {
             throw new ConflictException("Нельзя отправлять заявку на участие в собственном событии");
@@ -47,7 +49,7 @@ public class ParticipationService {
         }
 
         ParticipationStatus status = PENDING;
-        if (!event.getRequestModeration()) {
+        if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             status = CONFIRMED;
         }
 
@@ -60,12 +62,15 @@ public class ParticipationService {
         return repo.save(participation);
     }
 
+    @Transactional(readOnly = true)
     public List<Participation> getUserParticipations(long userId) {
         User user = userService.getById(userId);
         return repo.findByRequester(user);
     }
 
     public Participation cancelParticipation(long userId, long requestId) {
+        log.info("cancel participation {} by user {}", requestId, userId);
+
         User user = userService.getById(userId);
         Participation participation = getById(requestId);
 
@@ -73,11 +78,12 @@ public class ParticipationService {
             throw new NotFoundException("Заявка с id = " + requestId + " не найдена");
         }
 
-        participation.setStatus(REJECTED);
+        participation.setStatus(CANCELED);
 
         return repo.save(participation);
     }
 
+    @Transactional(readOnly = true)
     public List<Participation> getParticipationsOfEvent(long userId, long eventId) {
         User user = userService.getById(userId);
         Event event = eventService.getById(eventId);
@@ -90,6 +96,8 @@ public class ParticipationService {
     }
 
     public EventRequestStatusUpdateResult updateParticipationStatus(long userId, long eventId, EventRequestStatusUpdateRequest request) {
+
+        log.info("update participation for event {} by user {} (request = {})", eventId, userId, request);
 
         User user = userService.getById(userId);
         Event event = eventService.getFullById(eventId);
@@ -109,19 +117,24 @@ public class ParticipationService {
                 throw new ConflictException("Статус можно изменить только у заявок, находящихся в состоянии ожидания");
             }
 
-            if (request.getStatus() == REJECTED) {
-                participations.forEach(p -> p.setStatus(REJECTED));
-                repo.saveAll(participations);
+            switch (request.getStatus()) {
+                case REJECTED -> {
+                    participations.forEach(p -> p.setStatus(REJECTED));
+                    repo.saveAll(participations);
+                }
+                case CONFIRMED -> {
 
-            } else {
-                participations.stream()
-                        .limit(event.getParticipantLimit() - event.getConfirmedRequests())
-                        .forEach(p -> p.setStatus(CONFIRMED));
+                    // Одобряем заявки, пока лимит позволяет
+                    participations.stream()
+                            .limit(event.getParticipantLimit() - event.getConfirmedRequests())
+                            .forEach(p -> p.setStatus(CONFIRMED));
 
-                repo.saveAll(participations);
+                    repo.saveAll(participations);
 
-                if (event.getConfirmedRequests() + participations.size() > event.getParticipantLimit()) {
-                    repo.changeStatusForEventRequests(PENDING, REJECTED, event);
+                    // все прочие заявки отклоняем
+                    if (event.getConfirmedRequests() + participations.size() > event.getParticipantLimit()) {
+                        repo.changeStatusForEventRequests(PENDING, REJECTED, event);
+                    }
                 }
             }
         }
@@ -135,6 +148,7 @@ public class ParticipationService {
         );
     }
 
+    @Transactional(readOnly = true)
     public Participation getById(long id) {
         return repo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Заявка на участие с id = " + id + " не найдена."));
