@@ -13,7 +13,9 @@ import ru.practicum.user.User;
 import ru.practicum.user.UserService;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -66,6 +68,10 @@ public class EventService {
             return List.of();
         }
 
+        if (from < 0 || size <= 0) {
+            return List.of();
+        }
+
         List<User> users = getAllUsersById(userIds);
         List<Category> categories = getAllCategoriesById(categoryIds);
         List<EventState> states = getAllEventStateById(stateNames);
@@ -73,8 +79,8 @@ public class EventService {
         return repo.findAllByParams(userIds == null, users,
                 categoryIds == null, categories,
                 stateNames == null, states,
-                rangeStart == null, rangeStart == null ? LocalDateTime.now().minusDays(1) : rangeStart,
-                rangeEnd == null, rangeEnd == null ? LocalDateTime.now().plusDays(1) : rangeEnd,
+                rangeStart == null, rangeStart,
+                rangeEnd == null, rangeEnd,
                 from, size);
     }
 
@@ -177,6 +183,76 @@ public class EventService {
         } else {
             throw new NotFoundException("Событие с id = " + eventId + " не найдено.");
         }
+    }
+
+    public List<Event> searchEvents(String text, List<Long> categoryIds, Boolean paid, LocalDateTime rangeStart,
+                                    LocalDateTime rangeEnd, boolean onlyAvailable, EventSearchSort sort, long from, long size) {
+
+        log.info("search events for text {}, categoryIds {}, paid {}, rangeStart {}, rangeEnd {}, onlyAvailable {}, sort {}. from {}, size {}",
+                text, categoryIds, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+
+        if (categoryIds != null && categoryIds.isEmpty()) {
+            return List.of();
+        }
+
+        if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
+            return List.of();
+        }
+
+        if (rangeStart == null && rangeEnd == null) {
+            rangeStart = LocalDateTime.now();
+        }
+
+        if (from < 0 || size <= 0) {
+            return List.of();
+        }
+
+        String normalizedText = getNormalizedText(text);
+        List<Category> categories = getAllCategoriesById(categoryIds);
+
+        log.info("normalizedText = {}", normalizedText);
+        log.info("categories = {}", categories);
+
+        // Возвращаем весь подходящий набор событий без учета from и size,
+        // потому что этот набор, возможно, придется сортировать по просмотрам.
+        // А просмотры мы можем узнать из сервиса статистики после того, как
+        // узнаем список событий-претендентов. Таким образом, забираем весь
+        // набор событий-претендентов, узнаем из сервиса статистики кол-во
+        // их просмотров, сортируем, берем нужную страницу.
+        List<Event> events = repo.searchAllByParams(
+                text == null, normalizedText,
+                categoryIds == null, categories,
+                paid == null, paid,
+                rangeStart == null, rangeStart,
+                rangeEnd == null, rangeEnd);
+
+        log.info("events = {}", events);
+        log.info("events.size(1) = {}", events.size());
+
+        if (onlyAvailable) {
+            events = events.stream()
+                    .filter(e -> e.getParticipantLimit() != 0 && e.getConfirmedRequests() < e.getParticipantLimit())
+                    .collect(Collectors.toList());
+        }
+
+        log.info("events.size(2) = {}", events.size());
+
+        // TODO: получить кол-во просмотров
+
+        Comparator<Event> comp = switch (sort) {
+            case EVENT_DATE -> Comparator.comparing(Event::getEventDate);
+            case VIEWS -> Comparator.comparing(Event::getViews);
+        };
+
+        return events.stream()
+                .sorted(comp)
+                .skip(from)
+                .limit(size)
+                .toList();
+    }
+
+    private String getNormalizedText(String text) {
+        return text == null ? null : text.toLowerCase().trim();
     }
 
     private List<User> getAllUsersById(List<Long> ids) {

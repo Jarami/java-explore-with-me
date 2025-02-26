@@ -16,7 +16,7 @@ public interface EventRepo extends JpaRepository<Event, Long> {
     String FIND_ALL_BY_USER_WITH_LIMIT_AND_OFFSET = """
             SELECT new Event(e, count(p.id), 0)
             FROM Event e
-            LEFT JOIN Participation p ON p.event = event AND p.status = 'CONFIRMED'
+            LEFT JOIN Participation p ON p.event = e AND p.status = 'CONFIRMED'
             WHERE e.initiator = :user
             GROUP BY e
             ORDER BY e.eventDate DESC
@@ -27,7 +27,7 @@ public interface EventRepo extends JpaRepository<Event, Long> {
     String FIND_ALL_BY_PARAMS = """
             SELECT new Event(e, count(p.id), 0)
             FROM Event e
-            LEFT JOIN Participation p ON p.event = event AND p.status = 'CONFIRMED'
+            LEFT JOIN Participation p ON p.event = e AND p.status = 'CONFIRMED'
             WHERE ( :skipUsers = true OR e.initiator IN (:users) )
             AND ( :skipCategories = true OR e.category IN (:categories) )
             AND ( :skipStates = true OR e.state IN (:states) )
@@ -42,9 +42,83 @@ public interface EventRepo extends JpaRepository<Event, Long> {
     String FIND_FULL_BY_ID = """
             SELECT new Event(e, count(p.id), 0)
             FROM Event e
-            LEFT JOIN Participation p ON p.event = event AND p.status = 'CONFIRMED'
+            LEFT JOIN Participation p ON p.event = e AND p.status = 'CONFIRMED'
             WHERE e.id = :eventId
             GROUP BY e
+            """;
+
+//    String SEARCH_ALL_BY_PARAMS = """
+//            SELECT new Event(t.id,
+//                             t.title,
+//                             t.annotation,
+//                             t.category,
+//                             t.initiator,
+//                             t.description,
+//                             t.eventDate,
+//                             t.location,
+//                             t.paid,
+//                             t.participantLimit,
+//                             t.requestModeration,
+//                             t.state,
+//                             t.createdOn,
+//                             t.publishedOn,
+//                             t.confirmedRequests,
+//                             0)
+//            FROM (
+//                SELECT e.id,
+//                       e.title,
+//                       e.annotation,
+//                       e.category,
+//                       e.initiator,
+//                       e.description,
+//                       e.eventDate,
+//                       e.location,
+//                       e.paid,
+//                       e.participantLimit,
+//                       e.requestModeration,
+//                       e.state,
+//                       e.createdOn,
+//                       e.publishedOn,
+//                       count(p.id) as confirmedRequests
+//                FROM Event e
+//                LEFT JOIN Participation p ON p.event = e AND p.status = 'CONFIRMED'
+//                WHERE ( :skipText = true OR LOWER(e.annotation) LIKE %:text% OR LOWER(e.description) LIKE %:text% )
+//                AND ( :skipCategories = true OR e.category IN (:categories) )
+//                AND ( :skipPaid = true OR e.paid = :paid )
+//                AND ( :skipStart = true OR e.eventDate >= :start )
+//                AND ( :skipEnd = true OR e.eventDate <= :end )
+//                AND e.state = 'PUBLISHED'
+//                GROUP BY e.id,
+//                         e.title,
+//                         e.annotation,
+//                         e.category,
+//                         e.initiator,
+//                         e.description,
+//                         e.eventDate,
+//                         e.location,
+//                         e.paid,
+//                         e.participantLimit,
+//                         e.requestModeration,
+//                         e.state,
+//                         e.createdOn,
+//                         e.publishedOn
+//                ORDER BY e.eventDate DESC
+//            ) AS t
+//            WHERE ( :onlyAvailable = false OR t.participantLimit < t.confirmedRequests )
+//            """;
+
+    String SEARCH_ALL_BY_PARAMS = """
+            SELECT new Event(e, count(p.id), 0)
+            FROM Event e
+            LEFT JOIN Participation p ON p.event = e AND p.status = 'CONFIRMED'
+                WHERE ( :skipText = true OR LOWER(e.annotation) LIKE %:text% OR LOWER(e.description) LIKE %:text% )
+                AND ( :skipCategories = true OR e.category IN (:categories) )
+                AND ( :skipPaid = true OR e.paid = :paid )
+                AND ( :skipStart = true OR e.eventDate >= :start )
+                AND ( :skipEnd = true OR e.eventDate <= :end )
+                AND e.state = 'PUBLISHED'
+                GROUP BY e
+                ORDER BY e.eventDate DESC
             """;
 
     @Query(FIND_ALL_BY_USER_WITH_LIMIT_AND_OFFSET)
@@ -60,4 +134,11 @@ public interface EventRepo extends JpaRepository<Event, Long> {
 
     @Query(FIND_FULL_BY_ID)
     Optional<Event> findFullById(long eventId);
+
+    @Query(SEARCH_ALL_BY_PARAMS)
+    List<Event> searchAllByParams(boolean skipText, String text,
+                                  boolean skipCategories, List<Category> categories,
+                                  boolean skipPaid, Boolean paid,
+                                  boolean skipStart, LocalDateTime start,
+                                  boolean skipEnd, LocalDateTime end);
 }
