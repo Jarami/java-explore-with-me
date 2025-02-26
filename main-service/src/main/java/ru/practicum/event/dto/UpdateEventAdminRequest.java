@@ -21,7 +21,7 @@ public class UpdateEventAdminRequest implements UpdateEventRequest {
     @Size(min = 20, max = 7000, message = "Описание события должно содержать от 20-ти до 7000 символов")
     private String description;
 
-    @FutureIn(seconds = 60*60)
+    @FutureIn(seconds = 60 * 60)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 

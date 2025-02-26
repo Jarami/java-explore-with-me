@@ -9,8 +9,6 @@ import ru.practicum.user.User;
 
 import java.time.LocalDateTime;
 
-import static ru.practicum.participation.ParticipationStatus.PENDING;
-
 @Getter
 @Setter
 @Entity
