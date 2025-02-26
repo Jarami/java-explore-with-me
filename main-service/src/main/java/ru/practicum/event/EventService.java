@@ -17,6 +17,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ru.practicum.event.EventState.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -65,7 +67,7 @@ public class EventService {
         }
 
         if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
-            return List.of();
+            throw new BadRequestException("Задан rangeEnd до rangeStart");
         }
 
         if (from < 0 || size <= 0) {
@@ -196,7 +198,7 @@ public class EventService {
         }
 
         if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
-            return List.of();
+            throw new BadRequestException("Задан rangeEnd до rangeStart");
         }
 
         if (rangeStart == null && rangeEnd == null) {
@@ -209,9 +211,6 @@ public class EventService {
 
         String normalizedText = getNormalizedText(text);
         List<Category> categories = getAllCategoriesById(categoryIds);
-
-        log.info("normalizedText = {}", normalizedText);
-        log.info("categories = {}", categories);
 
         // Возвращаем весь подходящий набор событий без учета from и size,
         // потому что этот набор, возможно, придется сортировать по просмотрам.
@@ -226,16 +225,11 @@ public class EventService {
                 rangeStart == null, rangeStart,
                 rangeEnd == null, rangeEnd);
 
-        log.info("events = {}", events);
-        log.info("events.size(1) = {}", events.size());
-
         if (onlyAvailable) {
             events = events.stream()
                     .filter(e -> e.getParticipantLimit() != 0 && e.getConfirmedRequests() < e.getParticipantLimit())
                     .collect(Collectors.toList());
         }
-
-        log.info("events.size(2) = {}", events.size());
 
         // TODO: получить кол-во просмотров
 
@@ -249,6 +243,15 @@ public class EventService {
                 .skip(from)
                 .limit(size)
                 .toList();
+    }
+
+    public Event getPublishedEventById(long eventId) {
+        Event event = getFullById(eventId);
+        if (event.getState() != PUBLISHED) {
+            throw new NotFoundException("Событие с id = " + eventId + " не найдено.");
+        }
+
+        return event;
     }
 
     private String getNormalizedText(String text) {
