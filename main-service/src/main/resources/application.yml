@@ -20,6 +20,11 @@ server:
   error:
     include-stacktrace: never
 
+stat:
+  url: http://localhost:9090
+  readTimeout: 500
+  connectTimeout: 500
+
 management:
   endpoints:
     web:

@@ -9,6 +9,7 @@ import ru.practicum.hit.CreateHitRequest;
 import ru.practicum.hit.HitDto;
 import ru.practicum.stats.StatDto;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -17,12 +18,25 @@ import java.util.StringJoiner;
 public class StatClient {
 
     public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    public static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofMillis(500L);
+    public static final Duration DEFAULT_READ_TIMEOUT = Duration.ofMillis(500L);
 
     private final RestTemplate rest;
 
     public StatClient(String baseUrl) {
-        RestTemplateBuilder builder = new RestTemplateBuilder();
-        rest = builder.rootUri(baseUrl).build();
+        rest = new RestTemplateBuilder()
+                .rootUri(baseUrl)
+                .setConnectTimeout(DEFAULT_CONNECT_TIMEOUT)
+                .setReadTimeout(DEFAULT_READ_TIMEOUT)
+                .build();
+    }
+
+    public StatClient(String baseUrl, Duration connectTimeout, Duration readTimeout) {
+        rest = new RestTemplateBuilder()
+                .rootUri(baseUrl)
+                .setConnectTimeout(connectTimeout)
+                .setReadTimeout(readTimeout)
+                .build();
     }
 
     public HitDto hit(String app, String uri, String ip, LocalDateTime timestamp) {
