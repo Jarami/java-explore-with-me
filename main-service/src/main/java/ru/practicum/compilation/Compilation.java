@@ -1,9 +1,7 @@
 package ru.practicum.compilation;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import ru.practicum.event.Event;
 
 import java.util.ArrayList;
@@ -13,6 +11,8 @@ import java.util.List;
 @Setter
 @Entity
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "compilations")
 public class Compilation {
     @Id

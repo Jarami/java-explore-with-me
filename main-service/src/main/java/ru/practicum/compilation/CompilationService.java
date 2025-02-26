@@ -32,6 +32,11 @@ public class CompilationService {
         return repo.save(compilation);
     }
 
+    public void deleteCompilationById(Long id) {
+        Compilation compilation = getById(id);
+        repo.delete(compilation);
+    }
+
     private void checkEvents(List<Event> events, List<Long> inputEventIds) {
         if (!inputEventIds.isEmpty()) {
             List<Long> eventIds = events.stream().map(Event::getId).toList();
@@ -42,5 +47,10 @@ public class CompilationService {
                 throw new NotFoundException("Можно делать подборки только из существующих событий (" + absentIds + ")");
             }
         }
+    }
+
+    public Compilation getById(Long id) {
+        return repo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Подборка с id = " + id + " не найдена"));
     }
 }
