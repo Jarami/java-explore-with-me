@@ -1,4 +1,4 @@
-package ru.practicum.event.dto.validator;
+package ru.practicum.validator;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -10,13 +10,11 @@ import java.lang.annotation.Target;
 
 @Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = FutureInValidator.class)
-public @interface FutureIn {
-    String message() default "Invalid date";
+@Constraint(validatedBy = NullOrNotEmptyValidator.class)
+public @interface NullOrNotEmpty {
+    String message() default "Invalid string";
 
     Class<?>[] groups() default { };
 
     Class<? extends Payload>[] payload() default { };
-
-    long seconds() default 0;
 }
