@@ -2,6 +2,7 @@ package ru.practicum.hit;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.exception.BadRequestException;
 import ru.practicum.stats.Stat;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,10 @@ public class HitService {
     }
 
     public List<Stat> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+
+        if (start.isAfter(end)) {
+            throw new BadRequestException("Начальное время start не может быть больше конечного end");
+        }
 
         if (uris == null || uris.isEmpty()) {
             if (unique) {
