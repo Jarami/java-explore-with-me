@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.compilation.dto.NewCompilationDto;
+import ru.practicum.compilation.dto.UpdateCompilationRequest;
 import ru.practicum.event.Event;
 import ru.practicum.event.EventService;
 import ru.practicum.exception.BadRequestException;
@@ -46,6 +47,29 @@ public class CompilationService {
                 .pinned(dto.getPinned())
                 .events(events)
                 .build();
+
+        return repo.save(compilation);
+    }
+
+    public Compilation updateCompilation(long compId, UpdateCompilationRequest dto) {
+
+        log.info("update compilation {} with {}", compId, dto);
+
+        Compilation compilation = getById(compId);
+
+        if (dto.getEvents() != null) {
+            List<Event> events = dto.getEvents().isEmpty() ? List.of() : eventService.getAllFullById(dto.getEvents());
+            checkEvents(events, dto.getEvents());
+            compilation.setEvents(events);
+        }
+
+        if (dto.getTitle() != null) {
+            compilation.setTitle(dto.getTitle());
+        }
+
+        if (dto.getPinned() != null) {
+            compilation.setPinned(dto.getPinned());
+        }
 
         return repo.save(compilation);
     }

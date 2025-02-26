@@ -124,7 +124,12 @@ CREATE TABLE compilations (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(50) NOT NULL,
     pinned BOOLEAN NOT NULL DEFAULT false,
-    CONSTRAINT compilations_title_unq UNIQUE (title)
+
+    CONSTRAINT events_title_limits
+        CHECK (length(title) >= 1),
+
+    CONSTRAINT compilations_title_unq
+        UNIQUE (title)
 );
 COMMENT ON TABLE compilations IS 'Таблица подборок событий';
 COMMENT ON COLUMN compilations.id IS 'Идентификатор подборки';

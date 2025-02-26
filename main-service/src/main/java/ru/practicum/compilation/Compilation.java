@@ -2,6 +2,7 @@ package ru.practicum.compilation;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.validator.constraints.Length;
 import ru.practicum.event.Event;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class Compilation {
     private Long id;
 
     @Column(nullable = false, length = 50, unique = true)
+    @Length(min = 1, max = 50)
     private String title;
 
     @Column(nullable = false)
