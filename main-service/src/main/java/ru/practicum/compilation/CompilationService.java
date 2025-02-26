@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.compilation.dto.NewCompilationDto;
 import ru.practicum.event.Event;
 import ru.practicum.event.EventService;
+import ru.practicum.exception.BadRequestException;
 import ru.practicum.exception.NotFoundException;
 
 import java.util.List;
@@ -18,7 +19,24 @@ public class CompilationService {
     private final EventService eventService;
     private final CompilationRepo repo;
 
+    public List<Compilation> getCompilations(boolean pinned, long from, long size) {
+
+        log.info("get compilations for pinned {}, from {}, size {}", pinned, from, size);
+
+        if (from < 0) {
+            throw new BadRequestException("from должен быть неотрицательным");
+        }
+
+        if (size < 0) {
+            throw new BadRequestException("size должен быть неотрицательным");
+        }
+
+        return repo.findAllByPinnedWithLimitAndOffset(pinned, from, size);
+    }
+
     public Compilation createCompilation(NewCompilationDto dto) {
+
+        log.info("create compilation {}", dto);
 
         List<Event> events = dto.getEvents().isEmpty() ? List.of() : eventService.getAllFullById(dto.getEvents());
         checkEvents(events, dto.getEvents());
