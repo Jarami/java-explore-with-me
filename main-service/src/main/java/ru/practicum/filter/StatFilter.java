@@ -1,13 +1,11 @@
 package ru.practicum.filter;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.AbstractRequestLoggingFilter;
 import ru.practicum.StatClient;
-import ru.practicum.client.EventStatClient;
 
 import java.time.LocalDateTime;
 import java.util.Set;

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class EventStatClient extends EntityStatClient<Event>{
+public class EventStatClient extends EntityStatClient<Event> {
 
     public EventStatClient(StatClient statClient) {
         super(statClient);
