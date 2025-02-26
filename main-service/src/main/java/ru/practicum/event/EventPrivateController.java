@@ -7,10 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.event.dto.EventFullDto;
-import ru.practicum.event.dto.EventShortDto;
-import ru.practicum.event.dto.NewEventDto;
-import ru.practicum.event.dto.UpdateEventUserRequest;
+import ru.practicum.event.dto.*;
 import ru.practicum.participation.Participation;
 import ru.practicum.participation.ParticipationMapper;
 import ru.practicum.participation.ParticipationService;
@@ -70,6 +67,16 @@ public class EventPrivateController {
 
         List<Participation> participations = participationService.getParticipationsOfEvent(userId, eventId);
         return new ResponseEntity<>(participationMapper.toDto(participations), HttpStatus.OK);
+
+    }
+
+    @PatchMapping("/{eventId}/requests")
+    public ResponseEntity<EventRequestStatusUpdateResult> updateParticipationStatus(@PathVariable Long userId,
+                                                                                    @PathVariable Long eventId,
+                                                                                    @RequestBody EventRequestStatusUpdateRequest request) {
+
+        EventRequestStatusUpdateResult result = participationService.updateParticipationStatus(userId, eventId, request);
+        return new ResponseEntity<>(result, HttpStatus.OK);
 
     }
 }

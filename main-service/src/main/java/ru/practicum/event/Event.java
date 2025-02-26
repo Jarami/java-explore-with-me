@@ -112,5 +112,9 @@ public class Event {
             throw new ConflictException("Изменить можно только неопубликованное событие!");
         }
         state = newState;
+
+        if (state == PUBLISHED) {
+            publishedOn = LocalDateTime.now();
+        }
     }
 }

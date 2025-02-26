@@ -7,6 +7,7 @@ import ru.practicum.category.Category;
 import ru.practicum.category.CategoryService;
 import ru.practicum.event.dto.*;
 import ru.practicum.exception.BadRequestException;
+import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.user.User;
 import ru.practicum.user.UserService;
@@ -100,8 +101,14 @@ public class EventService {
         User user = userService.getById(userId);
         Event event = getFullById(eventId);
 
+        log.info("update event {} by user {}", event, user);
+
         if (!event.getInitiator().equals(user)) {
             throw new NotFoundException("Событие с id = " + eventId + " не найдено.");
+        }
+
+        if (event.getState() == EventState.PUBLISHED) {
+            throw new ConflictException("Нельзя изменить опубликованное событие");
         }
 
         if (request.getStateAction() != null) {
