@@ -22,7 +22,7 @@ server:
 
 stat:
   url: http://localhost:9090
-  readTimeout: 500
+  readTimeout: 1000
   connectTimeout: 500
 
 management:

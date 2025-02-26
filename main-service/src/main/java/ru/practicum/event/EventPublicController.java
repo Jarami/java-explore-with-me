@@ -31,16 +31,12 @@ public class EventPublicController {
                                             @RequestParam(defaultValue = "0") long from,
                                             @RequestParam(defaultValue = "10") long size) {
 
-        // TODO: обращение к этому эндпоинту сохранить в сервисе статистики
-
         List<Event> events = service.searchEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
         return new ResponseEntity<>(mapper.toShortDto(events), HttpStatus.OK);
     }
 
     @GetMapping("/{eventId}")
     public ResponseEntity<EventFullDto> getEvent(@PathVariable Long eventId) {
-
-        // TODO: обращение к этому эндпоинту сохранить в сервисе статистики
 
         Event event = service.getPublishedEventById(eventId);
         return new ResponseEntity<>(mapper.toFullDto(event), HttpStatus.OK);

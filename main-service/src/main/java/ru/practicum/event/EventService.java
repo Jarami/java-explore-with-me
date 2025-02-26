@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.category.Category;
 import ru.practicum.category.CategoryService;
+import ru.practicum.client.EventStatClient;
 import ru.practicum.event.dto.*;
 import ru.practicum.exception.BadRequestException;
 import ru.practicum.exception.ConflictException;
@@ -30,6 +31,7 @@ public class EventService {
     private final CategoryService categoryService;
     private final EventRepo repo;
     private final EventMapper mapper;
+    private final EventStatClient client;
 
     @Transactional
     public Event createEvent(NewEventDto dto, long userId) {
@@ -81,16 +83,12 @@ public class EventService {
         List<Category> categories = getAllCategoriesById(categoryIds);
         List<EventState> states = getAllEventStateById(stateNames);
 
-        List<Event> events = repo.findAllByParams(userIds == null, users,
+        return repo.findAllByParams(userIds == null, users,
                 categoryIds == null, categories,
                 stateNames == null, states,
                 rangeStart == null, rangeStart,
                 rangeEnd == null, rangeEnd,
                 from, size);
-
-        log.info("found events {}", events);
-
-        return events;
     }
 
     @Transactional
@@ -241,7 +239,7 @@ public class EventService {
                     .collect(Collectors.toList());
         }
 
-        // TODO: получить кол-во просмотров
+        client.setHits(events);
 
         Comparator<Event> comp = switch (sort) {
             case EVENT_DATE -> Comparator.comparing(Event::getEventDate);
@@ -286,13 +284,18 @@ public class EventService {
     }
 
     public Event getFullById(long eventId) {
-        // TODO: добавить views
-        return repo.findFullById(eventId)
+
+        Event event = repo.findFullById(eventId)
                 .orElseThrow(() -> new NotFoundException("Событие с id = " + eventId + " не найдено."));
+
+        client.setHits(event);
+
+        return event;
     }
 
     public List<Event> getAllFullById(List<Long> eventIds) {
-        // TODO: добавить views
-        return repo.findAllFullById(eventIds);
+        List<Event> events = repo.findAllFullById(eventIds);
+        client.setHits(events);
+        return events;
     }
 }
