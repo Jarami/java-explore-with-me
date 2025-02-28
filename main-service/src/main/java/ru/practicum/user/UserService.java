@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepo repo;
+    private final UserRepository repo;
     private final UserMapper mapper;
 
     @Transactional

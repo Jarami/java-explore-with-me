@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface EventRepo extends JpaRepository<Event, Long> {
+public interface EventRepository extends JpaRepository<Event, Long> {
 
     String FIND_ALL_BY_USER_WITH_LIMIT_AND_OFFSET = """
             SELECT new Event(e, count(p.id), 0)

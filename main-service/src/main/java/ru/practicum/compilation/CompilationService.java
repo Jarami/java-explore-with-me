@@ -20,7 +20,7 @@ import java.util.List;
 public class CompilationService {
 
     private final EventService eventService;
-    private final CompilationRepo repo;
+    private final CompilationRepository repo;
 
     @Transactional(readOnly = true)
     public List<Compilation> getCompilations(boolean pinned, long from, long size) {

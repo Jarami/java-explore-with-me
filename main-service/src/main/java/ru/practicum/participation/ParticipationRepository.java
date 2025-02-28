@@ -10,7 +10,7 @@ import ru.practicum.user.User;
 import java.util.List;
 
 @Repository
-public interface ParticipationRepo extends JpaRepository<Participation, Long> {
+public interface ParticipationRepository extends JpaRepository<Participation, Long> {
     List<Participation> findByRequester(User requester);
 
     List<Participation> findByEvent(Event event);

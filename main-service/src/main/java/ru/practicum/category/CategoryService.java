@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryService {
 
-    private final CategoryRepo repo;
+    private final CategoryRepository repo;
     private final CategoryMapper mapper;
 
     public Category createCategory(NewCategoryDto dto) {

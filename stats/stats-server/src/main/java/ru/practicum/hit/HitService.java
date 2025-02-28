@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class HitService {
-    private final HitRepo repo;
+    private final HitRepository repo;
     private final HitMapper mapper;
 
     public Hit save(CreateHitRequest request) {

@@ -26,7 +26,7 @@ public class ParticipationService {
 
     private final UserService userService;
     private final EventService eventService;
-    private final ParticipationRepo repo;
+    private final ParticipationRepository repo;
     private final ParticipationMapper mapper;
 
     public Participation createParticipation(long userId, long eventId) {

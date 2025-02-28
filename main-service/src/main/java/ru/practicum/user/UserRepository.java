@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface UserRepo extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
     String FIND_USERS_WITH_LIMIT_AND_OFFSET = """
             SELECT u

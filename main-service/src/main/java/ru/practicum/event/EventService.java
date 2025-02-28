@@ -29,7 +29,7 @@ public class EventService {
 
     private final UserService userService;
     private final CategoryService categoryService;
-    private final EventRepo repo;
+    private final EventRepository repo;
     private final EventMapper mapper;
     private final EventStatClient client;
 

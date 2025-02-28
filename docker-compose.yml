@@ -17,6 +17,7 @@ services:
       - "9090:9090"
     depends_on:
       - stats-db
+    restart: on-failure
 
   stats-db:
     image: postgres:16.1
@@ -32,6 +33,7 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
+    restart: on-failure
 
   main-service:
     build: ./main-service
@@ -53,6 +55,7 @@ services:
     depends_on:
       - main-db
       - stats-server
+    restart: on-failure
 
   main-db:
     image: postgres:16.1
@@ -68,3 +71,4 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
+    restart: on-failure

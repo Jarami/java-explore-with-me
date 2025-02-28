@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CompilationRepo extends JpaRepository<Compilation, Long> {
+public interface CompilationRepository extends JpaRepository<Compilation, Long> {
 
     String FIND_ALL_WITH_LIMIT_AND_OFFSET = """
             SELECT c
