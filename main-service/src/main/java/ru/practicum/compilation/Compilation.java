@@ -27,6 +27,9 @@ public class Compilation {
     @Column(nullable = false)
     private Boolean pinned;
 
-    @OneToMany
+    @ManyToMany
+    @JoinTable(name = "compilations_events",
+            joinColumns = { @JoinColumn(name = "compilation_id") },
+            inverseJoinColumns = { @JoinColumn(name = "events_id") })
     private List<Event> events = new ArrayList<>();
 }
