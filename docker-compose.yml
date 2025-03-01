@@ -3,11 +3,11 @@ services:
     build: ./stats/stats-server
     container_name: stats-server
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db/stats_server
-      SPRING_DATASOURCE_USERNAME: stats_user
-      SPRING_DATASOURCE_PASSWORD: stats_pass
+      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db/stat_db
+      SPRING_DATASOURCE_USERNAME: stat_user
+      SPRING_DATASOURCE_PASSWORD: stat_pass
     healthcheck:
-      test: curl -f https://stats-server/actuator/health || exit 1
+      test: curl -f http://stats-server/actuator/health || exit 1
       timeout: 5s
       interval: 5s
       retries: 10
@@ -17,6 +17,7 @@ services:
       - "9090:9090"
     depends_on:
       - stats-db
+    restart: on-failure
 
   stats-db:
     image: postgres:16.1
@@ -24,45 +25,50 @@ services:
     ports:
       - "6431:5432"
     environment:
-      - POSTGRES_PASSWORD=stats_pass
-      - POSTGRES_USER=stats_user
-      - POSTGRES_DB=stats_server
+      - POSTGRES_PASSWORD=stat_pass
+      - POSTGRES_USER=stat_user
+      - POSTGRES_DB=stat_db
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
       timeout: 5s
       interval: 5s
       retries: 10
+    restart: on-failure
 
-  ewm-service:
+  main-service:
     build: ./main-service
-    container_name: ewm-service
+    container_name: main-service
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://ewm-db/ewm_server
-      SPRING_DATASOURCE_USERNAME: ewm_user
-      SPRING_DATASOURCE_PASSWORD: ewm_pass
+      SPRING_DATASOURCE_URL: jdbc:postgresql://main-db/main_db
+      SPRING_DATASOURCE_USERNAME: main_user
+      SPRING_DATASOURCE_PASSWORD: main_pass
+      STAT_URL: http://stats-server:9090
     healthcheck:
-      test: curl -f https://ewm-service/actuator/health || exit 1
+      test: curl -f http://main-service/actuator/health || exit 1
       timeout: 5s
       interval: 5s
       retries: 10
-      start_period: 40s
+      start_period: 50s
       start_interval: 5s
     ports:
       - "8080:8080"
     depends_on:
-      - ewm-db
+      - main-db
+      - stats-server
+    restart: on-failure
 
-  ewm-db:
+  main-db:
     image: postgres:16.1
-    container_name: ewm-db
+    container_name: main-db
     ports:
       - "6432:5432"
     environment:
-      - POSTGRES_PASSWORD=ewm_pass
-      - POSTGRES_USER=ewm_user
-      - POSTGRES_DB=ewm_server
+      - POSTGRES_PASSWORD=main_pass
+      - POSTGRES_USER=main_user
+      - POSTGRES_DB=main_db
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
       timeout: 5s
       interval: 5s
       retries: 10
+    restart: on-failure

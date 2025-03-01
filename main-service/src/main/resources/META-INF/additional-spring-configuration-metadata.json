@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "stat.url",
+      "type": "java.lang.String",
+      "description": "Адрес сервиса статистики"
+    },
+    {
+      "name": "stat.readTimeout",
+      "type": "java.lang.Long",
+      "description": "Миллисекунд на передачу данных"
+    },
+    {
+      "name": "stat.connectTimeout",
+      "type": "java.lang.Long",
+      "description": "Миллисекунд на установку соединения"
+    }
+  ]
+}
