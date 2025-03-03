@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS events CASCADE;
 DROP TABLE IF EXISTS participations CASCADE;
 DROP TABLE IF EXISTS compilations CASCADE;
 DROP TABLE IF EXISTS compilations_events CASCADE;
+DROP TABLE IF EXISTS event_comments CASCADE;
 
 CREATE TABLE categories (
     id BIGSERIAL PRIMARY KEY,
@@ -151,3 +152,29 @@ CREATE TABLE compilations_events (
                 ON DELETE CASCADE
 );
 COMMENT ON TABLE compilations_events IS 'Ассоциативная таблица событий и подборок событий';
+
+CREATE TABLE event_comments (
+    id BIGSERIAL PRIMARY KEY,
+    comment TEXT NOT NULL,
+    author_id BIGINT NOT NULL,
+    event_id BIGINT NOT NULL,
+
+    created_on TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_on TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+
+    CONSTRAINT event_comments_author_fk
+        FOREIGN KEY(author_id)
+            REFERENCES users(id)
+                ON DELETE CASCADE,
+
+    CONSTRAINT event_comments_event_fk
+        FOREIGN KEY(event_id)
+            REFERENCES events(id)
+                ON DELETE CASCADE
+);
+COMMENT ON TABLE event_comments IS 'Таблица комментариев к событиям';
+COMMENT ON COLUMN event_comments.id IS 'Идентификатор комментария';
+COMMENT ON COLUMN event_comments.author_id IS 'Идентификатор автора комментария';
+COMMENT ON COLUMN event_comments.event_id IS 'Идентификатор события';
+COMMENT ON COLUMN event_comments.created_on IS 'Дата-время создания комментария';
+COMMENT ON COLUMN event_comments.updated_on IS 'Дата-время изменения комментария';
